@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Enseignant — PASE CONNECT</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 15px;
+    }
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    header h1 { font-size: 1.1rem; margin: 0; }
+    .btn-logout {
+      background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+    }
+    .card {
+      background: var(--card-bg); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px;
+    }
+    .card h3 {
+      margin-top: 0; color: #212529; font-size: 1rem; border-bottom: 2px solid #e9ecef; padding-bottom: 8px;
+    }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 4px; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem;
+    }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .btn {
+      background: var(--primary-color); color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; font-size: 0.9rem; cursor: pointer;
+    }
+    .btn:hover { background: #0b5ed7; }
+    .grid-notes {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    if (sessionStorage.getItem('pase_user_role') !== 'enseignant') {
+      alert("Accès refusé. Veuillez vous connecter.");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <header>
+     <h1>PASE CONNECT — Espace Enseignant (Cloud)</h1>
+     <button class="btn-logout" onclick="window.location.href='index.html'">Déconnexion</button>
+  </header>
+
+  <!-- FORMULAIRE D'INSCRIPTION D'UN ÉLÈVE -->
+  <div class="card">
+    <h3>📝 Inscription / Enregistrement d'un Élève</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="annee-scolaire-inscri">Année Scolaire :</label>
+        <select id="annee-scolaire-inscri">
+          <option value="2025-2026">2025-2026</option>
+          <option value="2026-2027" selected>2026-2027</option>
+          <option value="2027-2028">2027-2028</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="site-affectation">Site d'Affectation :</label>
+        <select id="site-affectation">
+          <option value="Djèrègbè Site A">Djèrègbè Site A</option>
+          <option value="Djèrègbè Site B">Djèrègbè Site B</option>
+          <option value="Annexe Awanou">Annexe Awanou</option>
+          <option value="Annexe Djeho">Annexe Djeho</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="nom-eleve">Nom & Prénom de l'Élève :</label>
+        <input type="text" id="nom-eleve" placeholder="ex: Kouassi Marc">
+      </div>
+      <div class="form-group">
+        <label for="genre-eleve">Genre :</label>
+        <select id="genre-eleve">
+          <option value="Garçon">Garçon</option>
+          <option value="Fille">Fille</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="classe-eleve">Classe :</label>
+      <select id="classe-eleve">
+        <option value="CI">CI</option>
+        <option value="CP">CP</option>
+        <option value="CE1">CE1</option>
+        <option value="CE2">CE2</option>
+        <option value="CM1">CM1</option>
+        <option value="CM2">CM2</option>
+        <option value="Maternelle">Maternelle</option>
+      </select>
+    </div>
+
+    <button class="btn" onclick="enregistrerEleve()">Inscrire l'Élève dans le Cloud</button>
+  </div>
+
+  <!-- GRILLE D'ÉVALUATION CERTIFICATIVE -->
+  <div class="card">
+    <h3>📊 Saisie de la Grille d'Évaluation (11 Disciplines)</h3>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="annee-scolaire-eval">Année Scolaire :</label>
+        <select id="annee-scolaire-eval">
+          <option value="2025-2026">2025-2026</option>
+          <option value="2026-2027" selected>2026-2027</option>
+          <option value="2027-2028">2027-2028</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="select-eleve-eval">Nom de l'Élève :</label>
+        <input type="text" id="select-eleve-eval" placeholder="Entrez le nom exact...">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="periode-eval">Période d'Évaluation :</label>
+      <select id="periode-eval">
+        <option value="1er Trimestre">1er Trimestre</option>
+        <option value="2ème Trimestre">2ème Trimestre</option>
+        <option value="3ème Trimestre">3ème Trimestre</option>
+      </select>
+    </div>
+
+    <div class="grid-notes">
+      <div class="form-group"><label>Comm. Orale (/10)</label><input type="number" id="n-comm" min="0" max="10"></div>
+      <div class="form-group"><label>Dictée (/10)</label><input type="number" id="n-dictee" min="0" max="10"></div>
+      <div class="form-group"><label>Expr. Écrite (/10)</label><input type="number" id="n-expr" min="0" max="10"></div>
+      <div class="form-group"><label>Lecture (/10)</label><input type="number" id="n-lect" min="0" max="10"></div>
+      <div class="form-group"><label>Mathématique (/20)</label><input type="number" id="n-maths" min="0" max="20"></div>
+      <div class="form-group"><label>EST (/10)</label><input type="number" id="n-est" min="0" max="10"></div>
+      <div class="form-group"><label>ES (/10)</label><input type="number" id="n-es" min="0" max="10"></div>
+      <div class="form-group"><label>Art Plastique (/10)</label><input type="number" id="n-artp" min="0" max="10"></div>
+      <div class="form-group"><label>Art Vivant (/10)</label><input type="number" id="n-artv" min="0" max="10"></div>
+      <div class="form-group"><label>EPS (/10)</label><input type="number" id="n-eps" min="0" max="10"></div>
+      <div class="form-group"><label>Anglais (/10)</label><input type="number" id="n-anglais" min="0" max="10"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group"><label for="seuil-eval">Seuil Atteint :</label><input type="text" id="seuil-eval" placeholder="ex: Oui / Non"></div>
+      <div class="form-group"><label for="rang-eval">Rang :</label><input type="text" id="rang-eval" placeholder="ex: 1er"></div>
+    </div>
+    <div class="form-group"><label for="obs-eval">Observation :</label><input type="text" id="obs-eval" placeholder="ex: Très bon travail"></div>
+
+    <button class="btn" onclick="enregistrerEvaluation()">Enregistrer le Bulletin dans le Cloud</button>
+  </div>
+
+  <script>
+    async function enregistrerEleve() {
+      const nom = document.getElementById('nom-eleve').value.trim();
+      const genre = document.getElementById('genre-eleve').value;
+      const site = document.getElementById('site-affectation').value;
+      const classe = document.getElementById('classe-eleve').value;
+      const annee = document.getElementById('annee-scolaire-inscri').value;
+
+      if (!nom) { alert("Veuillez entrer le nom de l'élève."); return; }
+
+      const { error } = await supabaseClient
+        .from('eleves')
+        .insert([{ nom, genre, site, classe, annee, date: new Date().toLocaleDateString() }]);
+
+      if (error) {
+        alert("Erreur Supabase : " + error.message);
+      } else {
+        alert(`Élève ${nom} inscrit et synchronisé avec succès !`);
+        document.getElementById('nom-eleve').value = "";
+      }
+    }
+
+    async function enregistrerEvaluation() {
+      const eleve = document.getElementById('select-eleve-eval').value.trim();
+      const annee = document.getElementById('annee-scolaire-eval').value;
+      const periode = document.getElementById('periode-eval').value;
+
+      if (!eleve) { alert("Veuillez saisir le nom de l'élève."); return; }
+
+      const notes = {
+        comm: Number(document.getElementById('n-comm').value) || 0,
+        dictee: Number(document.getElementById('n-dictee').value) || 0,
+        expr: Number(document.getElementById('n-expr').value) || 0,
+        lect: Number(document.getElementById('n-lect').value) || 0,
+        maths: Number(document.getElementById('n-maths').value) || 0,
+        est: Number(document.getElementById('n-est').value) || 0,
+        es: Number(document.getElementById('n-es').value) || 0,
+        artp: Number(document.getElementById('n-artp').value) || 0,
+        artv: Number(document.getElementById('n-artv').value) || 0,
+        eps: Number(document.getElementById('n-eps').value) || 0,
+        anglais: Number(document.getElementById('n-anglais').value) || 0
+      };
+
+      const total = Object.values(notes).reduce((a, b) => a + b, 0);
+      const moyenne = (total / 12).toFixed(2);
+      const cle_unique = `${eleve.toLowerCase()}_${annee}`;
+
+      // Upsert (met à jour si existe, insère sinon)
+      const { error } = await supabaseClient
+        .from('bulletins')
+        .upsert([{ 
+          cle_unique, 
+          eleve, 
+          annee, 
+          periode, 
+          notes, 
+          total, 
+          moyenne, 
+          seuil: document.getElementById('seuil-eval').value,
+          rang: document.getElementById('rang-eval').value,
+          obs: document.getElementById('obs-eval').value 
+        }], { onConflict: 'cle_unique' });
+
+      if (error) {
+        alert("Erreur Supabase : " + error.message);
+      } else {
+        alert(`Bulletin de ${eleve} enregistré et synchronisé dans le cloud !`);
+      }
+    }
+  </script>
+
+</body>
+</html>
