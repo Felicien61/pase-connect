@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PASE CONNECT — Accueil</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    :root {
+      --pase-green: #198754;
+      --pase-dark: #212529;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background-color: var(--card-bg);
+      padding: 25px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .logo-container {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 10px auto;
+    }
+
+    .logo-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: var(--pase-dark);
+      margin: 10px 0 5px 0;
+      font-weight: bold;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: var(--pase-dark);
+    }
+
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      outline: none;
+      background-color: #fff;
+    }
+
+    .btn-login {
+      width: 100%;
+      background-color: var(--pase-green);
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .btn-login:hover { background-color: #146c43; }
+
+    footer {
+      margin-top: 25px;
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- LOGO OFFICIEL FIDÈLE INTÉGRÉ -->
+    <div class="logo-container">
+      <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <!-- Double cercle vert extérieur -->
+        <circle cx="250" cy="250" r="235" fill="none" stroke="#198754" stroke-width="12" />
+        <circle cx="250" cy="250" r="220" fill="none" stroke="#198754" stroke-width="3" />
+
+        <!-- Étoiles dorées du haut -->
+        <g fill="#d4af37" transform="translate(180, 50) scale(0.75)">
+          <polygon points="12,2 15,9 23,10 17,15 19,22 12,18 5,22 7,15 1,10 9,9" transform="translate(-10,0)" />
+          <polygon points="12,2 15,9 23,10 17,15 19,22 12,18 5,22 7,15 1,10 9,9" transform="translate(15,0)" />
+          <polygon points="12,2 15,9 23,10 17,15 19,22 12,18 5,22 7,15 1,10 9,9" transform="translate(40,0)" />
+          <polygon points="12,2 15,9 23,10 17,15 19,22 12,18 5,22 7,15 1,10 9,9" transform="translate(65,0)" />
+          <polygon points="12,2 15,9 23,10 17,15 19,22 12,18 5,22 7,15 1,10 9,9" transform="translate(90,0)" />
+        </g>
+
+        <!-- Branches de lauriers -->
+        <path d="M 120,240 C 90,160 130,90 200,65" fill="none" stroke="#198754" stroke-width="6" stroke-linecap="round" />
+        <path d="M 380,240 C 410,160 370,90 300,65" fill="none" stroke="#198754" stroke-width="6" stroke-linecap="round" />
+
+        <!-- Écoliers au centre -->
+        <g transform="translate(205, 85)">
+          <!-- Garçon -->
+          <circle cx="15" cy="18" r="9" fill="#212529" />
+          <path d="M 7,28 Q 15,22 23,28 L 21,50 L 9,50 Z" fill="#ffc107" stroke="#212529" stroke-width="1.5" />
+          <line x1="12" y1="50" x2="10" y2="70" stroke="#212529" stroke-width="2.5" />
+          <line x1="18" y1="50" x2="20" y2="70" stroke="#212529" stroke-width="2.5" />
+          
+          <!-- Fille -->
+          <circle cx="60" cy="22" r="9" fill="#212529" />
+          <path d="M 52,32 Q 60,26 68,32 L 66,54 L 54,54 Z" fill="#ffc107" stroke="#212529" stroke-width="1.5" />
+          <line x1="57" y1="54" x2="55" y2="74" stroke="#212529" stroke-width="2.5" />
+          <line x1="63" y1="54" x2="65" y2="74" stroke="#212529" stroke-width="2.5" />
+        </g>
+
+        <!-- Grandes étoiles vertes latérales -->
+        <polygon points="25,10 32,25 49,27 36,39 40,56 25,47 10,56 14,39 1,27 18,25" fill="#198754" transform="translate(50, 220) scale(0.9)" />
+        <polygon points="25,10 32,25 49,27 36,39 40,56 25,47 10,56 14,39 1,27 18,25" fill="#198754" transform="translate(400, 220) scale(0.9)" />
+
+        <!-- Texte PASE -->
+        <text x="250" y="295" font-family="Arial, sans-serif" font-weight="900" font-size="65" fill="#198754" text-anchor="middle" letter-spacing="4">PASE</text>
+
+        <!-- Banderole et texte officiel -->
+        <g transform="translate(250, 350)">
+          <path d="M -165,-15 L 165,-15 L 145,55 L -145,55 Z" fill="#ffffff" stroke="#212529" stroke-width="2" />
+          <text x="0" y="4" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#212529" text-anchor="middle">PRIORITÉS ET ACTIONS</text>
+          <text x="0" y="22" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#212529" text-anchor="middle">POUR LA SCOLARISATION</text>
+          <text x="0" y="40" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#212529" text-anchor="middle">ET L'ÉDUCATION</text>
+        </g>
+      </svg>
+    </div>
+
+    <h1>PASE CONNECT</h1>
+    <p class="subtitle">Plateforme de Gestion Scolaire Multi-Sites</p>
+
+    <div class="form-group">
+      <label for="role-select">Sélectionnez votre Espace :</label>
+      <select id="role-select" onchange="changerModeConnexion()">
+        <option value="parent">Espace Parent (Public)</option>
+        <option value="enseignant">Espace Enseignant</option>
+        <option value="admin">Espace Direction / Administration</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="group-pass" style="display: none;">
+      <label for="pass-input">Code d'accès / Mot de passe :</label>
+      <input type="password" id="pass-input" placeholder="Entrez votre mot de passe...">
+    </div>
+
+    <button class="btn-login" onclick="connexion()">Accéder à l'Espace</button>
+
+    <footer>
+      PASE CONNECT &copy; 2025-2028 — Tous droits réservés
+    </footer>
+  </div>
+
+  <script>
+    function changerModeConnexion() {
+      const role = document.getElementById('role-select').value;
+      const passGroup = document.getElementById('group-pass');
+      passGroup.style.display = (role === 'parent') ? 'none' : 'block';
+    }
+
+    function connexion() {
+      const role = document.getElementById('role-select').value;
+      const pass = document.getElementById('pass-input').value.trim();
+
+      if (role === 'admin') {
+        if (pass === 'admin') {
+          sessionStorage.setItem('pase_user_role', 'admin');
+          window.location.href = 'espace-admin.html';
+        } else {
+          alert('Mot de passe Administrateur incorrect.');
+        }
+      } else if (role === 'enseignant') {
+        if (pass === 'prof') {
+          sessionStorage.setItem('pase_user_role', 'enseignant');
+          window.location.href = 'espace-enseignant.html';
+        } else {
+          alert('Mot de passe Enseignant incorrect.');
+        }
+      } else {
+        sessionStorage.setItem('pase_user_role', 'parent');
+        window.location.href = 'espace-parent.html';
+      }
+    }
+  </script>
+
+</body>
+</html>
