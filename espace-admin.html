@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Administration — PASE CONNECT</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    :root {
+      --primary-color: #212529;
+      --pase-green: #198754;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 15px;
+    }
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    header h1 { font-size: 1.1rem; margin: 0; }
+    .btn-logout {
+      background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      text-align: center;
+      border-top: 4px solid var(--pase-green);
+    }
+    .stat-card h4 {
+      margin: 0 0 5px 0;
+      font-size: 0.75rem;
+      color: #6c757d;
+      text-transform: uppercase;
+    }
+    .stat-card .value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      margin-bottom: 15px;
+    }
+    .card h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 1rem;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 8px;
+    }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 4px; }
+    .form-group select, .form-group input {
+      width: 100%; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; box-sizing: border-box; font-size: 0.85rem;
+    }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      text-align: left;
+      font-size: 0.8rem;
+    }
+    th {
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .btn-action {
+      background-color: var(--pase-green);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    .btn-pdf {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-refresh {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    .badge-g { background-color: #cfe2ff; color: #084298; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    .badge-f { background-color: #f8d7da; color: #842029; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #zone-bulletin-admin, #zone-bulletin-admin * { visibility: visible; }
+      #zone-bulletin-admin { position: absolute; left: 0; top: 0; width: 100%; }
+      .btn-pdf { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    if (sessionStorage.getItem('pase_user_role') !== 'admin') {
+      alert("Accès refusé. Connectez-vous en tant qu'Administrateur.");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <header>
+     <h1>PASE CONNECT — Administration (Cloud)</h1>
+     <button class="btn-logout" onclick="window.location.href='index.html'">Déconnexion</button>
+  </header>
+
+  <!-- STATISTIQUES GLOBALES PAR SITE -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h4>Djèrègbè Site A</h4>
+      <div class="value" id="count-site-a">0 Élèves</div>
+    </div>
+    <div class="stat-card">
+      <h4>Djèrègbè Site B</h4>
+      <div class="value" id="count-site-b">0 Élèves</div>
+    </div>
+    <div class="stat-card">
+      <h4>Annexe Awanou</h4>
+      <div class="value" id="count-awanou">0 Élèves</div>
+    </div>
+    <div class="stat-card">
+      <h4>Annexe Djeho</h4>
+      <div class="value" id="count-djeho">0 Élèves</div>
+    </div>
+  </div>
+
+  <!-- REGISTRE DES ÉLÈVES -->
+  <div class="card">
+    <h3>👨‍🎓 Registre des Élèves Inscrits (Cloud)</h3>
+    <button class="btn-refresh" onclick="chargerAdmin()">🔄 Actualiser depuis le Cloud</button>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom & Prénom</th>
+            <th>Genre</th>
+            <th>Site</th>
+            <th>Classe</th>
+            <th>Année</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-admin-eleves"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONSULTATION BULLETIN -->
+  <div class="card">
+    <h3>📜 Consultation du Bulletin d'un Élève</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="admin-search-eleve">Nom de l'Élève :</label>
+        <input type="text" id="admin-search-eleve" placeholder="ex: Kouassi Marc">
+      </div>
+      <div class="form-group">
+        <label for="admin-search-annee">Année Scolaire :</label>
+        <select id="admin-search-annee">
+          <option value="2025-2026">2025-2026</option>
+          <option value="2026-2027" selected>2026-2027</option>
+          <option value="2027-2028">2027-2028</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-action" onclick="afficherBulletinEleveAdmin()">Afficher le Bulletin</button>
+    <div id="zone-bulletin-admin" style="margin-top: 15px;"></div>
+  </div>
+
+  <!-- FILTRES STATISTIQUES -->
+  <div class="card">
+    <h3>📊 Statistiques & Tableau Récapitulatif</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="filter-site">Filtrer par Site :</label>
+        <select id="filter-site" onchange="chargerAdmin()">
+          <option value="TOUS">Tous les Sites</option>
+          <option value="Djèrègbè Site A">Djèrègbè Site A</option>
+          <option value="Djèrègbè Site B">Djèrègbè Site B</option>
+          <option value="Annexe Awanou">Annexe Awanou</option>
+          <option value="Annexe Djeho">Annexe Djeho</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="filter-classe">Filtrer par Classe :</label>
+        <select id="filter-classe" onchange="chargerAdmin()">
+          <option value="TOUS">Toutes les Classes</option>
+          <option value="CI">CI</option>
+          <option value="CP">CP</option>
+          <option value="CE1">CE1</option>
+          <option value="CE2">CE2</option>
+          <option value="CM1">CM1</option>
+          <option value="CM2">CM2</option>
+          <option value="Maternelle">Maternelle</option>
+        </select>
+      </div>
+    </div>
+    <div id="zone-stats-filtre">
+      <p style="text-align: center; color: #6c757d;">Chargement des données...</p>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      chargerAdmin();
+    };
+
+    async function chargerAdmin() {
+      const { data: eleves, error } = await supabaseClient.from('eleves').select('*');
+      if (error) { console.error("Erreur chargement élèves:", error); return; }
+
+      document.getElementById('count-site-a').textContent = eleves.filter(e => e.site && e.site.includes('Site A')).length + " Élèves";
+      document.getElementById('count-site-b').textContent = eleves.filter(e => e.site && e.site.includes('Site B')).length + " Élèves";
+      document.getElementById('count-awanou').textContent = eleves.filter(e => e.site && e.site.includes('Awanou')).length + " Élèves";
+      document.getElementById('count-djeho').textContent = eleves.filter(e => e.site && e.site.includes('Djeho')).length + " Élèves";
+
+      const tbody = document.getElementById('table-admin-eleves');
+      if (eleves.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Aucun élève inscrit.</td></tr>`;
+      } else {
+        tbody.innerHTML = eleves.map(e => `
+          <tr>
+            <td><strong>${e.nom}</strong></td>
+            <td><span class="${e.genre === 'Garçon' ? 'badge-g' : 'badge-f'}">${e.genre || 'N/A'}</span></td>
+            <td>${e.site || '-'}</td>
+            <td>${e.classe || '-'}</td>
+            <td>${e.annee || '-'}</td>
+            <td><button class="btn-action" onclick="voirBulletin('${e.nom}', '${e.annee || '2026-2027'}')">Voir Bulletin</button></td>
+          </tr>
+        `).join('');
+      }
+
+      filtrerStatistiques(eleves);
+    }
+
+    function voirBulletin(nomEleve, annee) {
+      document.getElementById('admin-search-eleve').value = nomEleve;
+      document.getElementById('admin-search-annee').value = annee;
+      afficherBulletinEleveAdmin();
+    }
+
+    async function afficherBulletinEleveAdmin() {
+      const nom = document.getElementById('admin-search-eleve').value.trim().toLowerCase();
+      const annee = document.getElementById('admin-search-annee').value;
+      const zone = document.getElementById('zone-bulletin-admin');
+
+      if (!nom) { alert("Veuillez saisir le nom d'un élève."); return; }
+
+      const cle_unique = `${nom}_${annee}`;
+      const { data, error } = await supabaseClient.from('bulletins').select('*').eq('cle_unique', cle_unique).single();
+
+      if (error || !data) {
+        zone.innerHTML = `<p style="color:#dc3545; text-align:center;">Aucun bulletin trouvé pour "<strong>${nom}</strong>" (${annee}).</p>`;
+        return;
+      }
+
+      const d = data;
+      const n = d.notes || {};
+
+      zone.innerHTML = `
+        <div style="background:#fff; padding:20px; border:2px solid #212529; border-radius:8px;">
+          <div style="text-align:center; border-bottom:2px solid #212529; padding-bottom:10px; margin-bottom:15px;">
+            <h2 style="margin:0; font-size:1.2rem; color:#212529;">PASE CONNECT — BULLETIN D'ÉVALUATION</h2>
+            <p style="margin:5px 0; font-size:0.85rem; color:#6c757d;">Année Scolaire ${d.annee} | ${d.periode}</p>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:15px;">
+            <div><strong>Nom & Prénom :</strong> ${d.eleve}</div>
+          </div>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:15px;">
+            <thead>
+              <tr style="background:#f8f9fa;">
+                <th style="border:1px solid #000; padding:6px;">Champs de Formation</th>
+                <th style="border:1px solid #000; padding:6px; text-align:center;">Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="border:1px solid #000; padding:6px;">Communication Orale</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.comm ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Dictée</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.dictee ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Expression Écrite</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.expr ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Lecture</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.lect ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Mathématique</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.maths ?? '-'} / 20</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">EST</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.est ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">ES</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.es ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Art Plastique</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.artp ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Art Vivant</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.artv ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">EPS</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.eps ?? '-'} / 10</strong></td></tr>
+              <tr><td style="border:1px solid #000; padding:6px;">Anglais</td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${n.anglais ?? '-'} / 10</strong></td></tr>
+              <tr style="background:#e9ecef;"><td style="border:1px solid #000; padding:6px;"><strong>Total Points</strong></td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${d.total} pts</strong></td></tr>
+              <tr style="background:#e9ecef;"><td style="border:1px solid #000; padding:6px;"><strong>Seuil Atteint</strong></td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${d.seuil || '-'}</strong></td></tr>
+              <tr style="background:#e9ecef;"><td style="border:1px solid #000; padding:6px;"><strong>Rang</strong></td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${d.rang || '-'}</strong></td></tr>
+              <tr style="background:#e9ecef;"><td style="border:1px solid #000; padding:6px;"><strong>Observation</strong></td><td style="border:1px solid #000; padding:6px; text-align:center;"><strong>${d.obs || '-'}</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-pdf" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+      `;
+    }
+
+    async function filtrerStatistiques(elevesList) {
+      const siteFiltre = document.getElementById('filter-site').value;
+      const classeFiltre = document.getElementById('filter-classe').value;
+      const zone = document.getElementById('zone-stats-filtre');
+
+      let eleves = elevesList || [];
+      if (!elevesList) {
+        const { data } = await supabaseClient.from('eleves').select('*');
+        eleves = data || [];
+      }
+
+      let elevesFiltres = eleves.filter(e => {
+        let matchSite = (siteFiltre === 'TOUS') || (e.site === siteFiltre);
+        let matchClasse = (classeFiltre === 'TOUS') || (e.classe === classeFiltre);
+        return matchSite && matchClasse;
+      });
+
+      zone.innerHTML = `<p><strong>Effectif Sélectionné :</strong> ${elevesFiltres.length} élèves (${elevesFiltres.filter(e => e.genre === 'Garçon').length} Garçons, ${elevesFiltres.filter(e => e.genre === 'Fille').length} Filles)</p>`;
+    }
+  </script>
+
+</body>
+</html>
