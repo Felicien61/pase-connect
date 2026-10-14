@@ -1,0 +1,16 @@
+{
+  "short_name": "PASE Connect",
+  "name": "PASE CONNECT — Plateforme Scolaire",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2991/2991106.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#212529",
+  "theme_color": "#198754",
+  "display": "standalone",
+  "orientation": "portrait"
+}
